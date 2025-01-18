@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: homework-pod
+  namespace: homework
+  labels:
+    app: homework-webserver
+spec:
+  initContainers:
+  - name: init-container
+    image: busybox
+    command:
+      - sh
+      - -c
+      - >
+        mkdir -p /init &&
+        echo "<h1>Homework POD</h1>" > /init/index.html;
+    volumeMounts:
+    - name: shared-volume
+      mountPath: /init
+
+  containers:
+  - name: main-container
+    image: python:3.9-slim
+    command:
+      - sh
+      - -c
+      - >
+        python3 -m http.server 8000 --directory /homework;
+    ports:
+    - containerPort: 8000
+    volumeMounts:
+    - name: shared-volume
+      mountPath: /homework
+    lifecycle:
+      preStop:
+        exec:
+          command:
+          - sh
+          - -c
+          - >
+            echo "Deleting index.html" &&
+            rm -f /homework/index.html;
+
+  volumes:
+  - name: shared-volume
+    emptyDir: {}
+
+  terminationGracePeriodSeconds: 30
+
