@@ -4,72 +4,67 @@ metadata:
   name: homework-deployment
   namespace: homework
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: homework
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 1
   template:
     metadata:
       labels:
         app: homework
     spec:
-      nodeSelector:
-        homework: "true"
-      initContainers:
-      - name: init-container
-        image: busybox
-        command:
-          - sh
-          - -c
-          - >
-            mkdir -p /init &&
-            echo "<h1>Homework POD</h1>" > /init/index.html;
-        volumeMounts:
-        - name: shared-volume
-          mountPath: /init
-
-      containers:
-      - name: main-container
-        image: python:3.9-slim
-        command:
-          - sh
-          - -c
-          - >
-            python3 -m http.server 8000 --directory /homework;
-        ports:
-        - containerPort: 8000
-        volumeMounts:
-        - name: shared-volume
-          mountPath: /homework
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /index.html
-            port: 8000          
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        lifecycle:
-          preStop:
-            exec:
-              command:
-              - sh
-              - -c
-              - >
-                echo "Deleting index.html" &&
-                rm -f /homework/index.html;
-
       volumes:
-      - name: shared-volume
-        emptyDir: {}
-
+        - name: shared-volume
+          emptyDir: {}
+      containers:
+        - name: main-container
+          image: python:3.9-slim
+          command:
+            - sh
+            - -c
+            - >
+              python3 -m http.server 8000 --bind 0.0.0.0 --directory /homework;
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: shared-volume
+              mountPath: /homework
+          livenessProbe:
+            httpGet:
+              path: /health.html  # Checks the health.html file for liveness
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /index.html  # Checks the index.html file for readiness
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                - sh
+                - -c
+                - >
+                  echo "Deleting index.html" &&
+                  rm -f /homework/index.html;
+      initContainers:
+        - name: init-container
+          image: busybox
+          command:
+            - sh
+            - -c
+            - >
+              echo "<html><body>OK</body></html>" > /homework/health.html &&
+              echo "<html><body><h1>Welcome to Homework</h1></body></html>" > /homework/index.html;
+          volumeMounts:
+            - name: shared-volume
+              mountPath: /homework
       terminationGracePeriodSeconds: 30
 

@@ -4,13 +4,13 @@ metadata:
   name: homework-ingress
   namespace: homework
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /index.html  # Правило переписывания пути
+    nginx.ingress.kubernetes.io/rewrite-target: /  # Rewrite to the root path
 spec:
   rules:
-  - host: homework.otus
+  - host: homework.otus  # Replace with your domain or ingress controller settings
     http:
       paths:
-      - path: /homepage
+      - path: /homework
         pathType: Prefix
         backend:
           service:
