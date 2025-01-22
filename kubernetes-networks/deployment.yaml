@@ -31,7 +31,7 @@ spec:
               mountPath: /homework
           livenessProbe:
             httpGet:
-              path: /health.html  # Checks the health.html file for liveness
+              path: /health.html 
               port: 8000
             initialDelaySeconds: 5
             periodSeconds: 10

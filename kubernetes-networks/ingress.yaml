@@ -4,10 +4,10 @@ metadata:
   name: homework-ingress
   namespace: homework
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /  # Rewrite to the root path
+    nginx.ingress.kubernetes.io/rewrite-target: /  
 spec:
   rules:
-  - host: homework.otus  # Replace with your domain or ingress controller settings
+  - host: homework.otus
     http:
       paths:
       - path: /homework
