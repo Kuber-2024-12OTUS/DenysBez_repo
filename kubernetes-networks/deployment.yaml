@@ -39,7 +39,7 @@ spec:
             failureThreshold: 3
           readinessProbe:
             httpGet:
-              path: /index.html  # Checks the index.html file for readiness
+              path: /index.html
               port: 8000
             initialDelaySeconds: 5
             periodSeconds: 10
