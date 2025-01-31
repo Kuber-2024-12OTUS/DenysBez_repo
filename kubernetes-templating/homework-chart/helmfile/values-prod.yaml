@@ -1,0 +1,21 @@
+replicaCount: 5
+
+image:
+  tag: "3.5.2" 
+
+listeners:
+  client:
+    protocol: SASL_PLAINTEXT
+  interbroker:
+    protocol: SASL_PLAINTEXT
+
+auth:
+  clientProtocol: sasl
+  interBrokerProtocol: sasl
+  sasl:
+    mechanisms: plain
+    clientUsers:
+      - user
+    clientPasswords:
+      - password
+
