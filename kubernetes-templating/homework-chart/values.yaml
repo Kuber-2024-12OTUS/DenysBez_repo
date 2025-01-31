@@ -1,0 +1,37 @@
+replicaCount: 1
+
+image:
+  repository: python
+  tag: "3.9-slim"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: true
+  name: homework-ingress
+  host: homework.otus
+  pathPrefix: /homework
+  serviceName: homework-service
+  servicePort: 8000
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+
+probes:
+  enabled: true
+  livenessPath: "/health.html"
+  readinessPath: "/index.html"
+
+resources: {}
+
+volume:
+  pvcName: "homework-pvc"
+
+configMap:
+  name: "homework-configmap"
+
+serviceAccount:
+  name: monitoring
+

@@ -1,0 +1,11 @@
+replicaCount: 1
+
+listeners:
+  client:
+    protocol: PLAINTEXT
+  interbroker:
+    protocol: PLAINTEXT
+
+auth:
+  enabled: false  
+

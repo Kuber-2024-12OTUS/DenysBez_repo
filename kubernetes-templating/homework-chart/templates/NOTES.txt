@@ -1,0 +1,5 @@
+Release "{{ .Release.Name }}" installed
+
+You can access your application at:
+http://{{ .Values.ingress.host }}{{ .Values.ingress.pathPrefix | default "/" }}
+

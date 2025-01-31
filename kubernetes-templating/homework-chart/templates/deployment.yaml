@@ -1,58 +1,63 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: homework-deployment
-  namespace: homework
+  name: {{ .Release.Name }}-deployment
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: homework
+      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: homework
+        app: {{ .Release.Name }}
     spec:
-      serviceAccountName: monitoring
+      serviceAccountName: {{ .Values.serviceAccount.name }}
       volumes:
         - name: shared-volume
           persistentVolumeClaim:
-            claimName: homework-pvc
+            claimName: {{ .Values.volume.pvcName }}
         - name: config-volume
           configMap:
-            name: homework-configmap
+            name: {{ .Values.configMap.name }}
       containers:
-        - name: main-container
-          image: python:3.9-slim
+        - name: {{ .Release.Name }}-container
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - sh
             - -c
             - >
-              python3 -m http.server 8000 --bind 0.0.0.0 --directory /homework;
+              python3 -m http.server {{ .Values.service.port }} --bind 0.0.0.0 --directory /homework;
           ports:
-            - containerPort: 8000
+            - containerPort: {{ .Values.service.port }}
           volumeMounts:
             - name: shared-volume
               mountPath: /homework
             - name: config-volume
               mountPath: /homework/conf
               readOnly: true
+          {{- if .Values.probes.enabled }}
           livenessProbe:
             httpGet:
-              path: /health.html
-              port: 8000
+              path: {{ .Values.probes.livenessPath }}
+              port: {{ .Values.service.port }}
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 1
             failureThreshold: 3
           readinessProbe:
             httpGet:
-              path: /index.html
-              port: 8000
+              path: {{ .Values.probes.readinessPath }}
+              port: {{ .Values.service.port }}
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 1
             failureThreshold: 3
+          {{- end }}
           lifecycle:
             preStop:
               exec:
