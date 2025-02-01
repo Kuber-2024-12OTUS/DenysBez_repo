@@ -1,16 +1,16 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: mysqls.otus.mysql.operator
+  name: mysqls.otus.homework
 spec:
-  group: otus.mysql.operator
-  scope: Namespaced
+  group: otus.homework
   names:
+    kind: MySQL
     plural: mysqls
     singular: mysql
-    kind: MySQLDB
     shortNames:
-      - ms
+      - my
+  scope: Namespaced
   versions:
     - name: v1
       served: true
@@ -19,26 +19,16 @@ spec:
         openAPIV3Schema:
           type: object
           properties:
-            apiVersion:
-              type: string
-            kind:
-              type: string
-            metadata:
-              type: object
             spec:
               type: object
               required: ["image", "database", "password", "storage_size"]
               properties:
                 image:
                   type: string
-                  description: "Docker image to use for MySQL instance"
                 database:
                   type: string
-                  description: "Name of the MySQL database"
                 password:
                   type: string
-                  description: "Password for MySQL"
                 storage_size:
                   type: string
-                  description: "Size of the storage for the database"
 
