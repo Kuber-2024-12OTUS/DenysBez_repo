@@ -1,0 +1,11 @@
+apiVersion: otus.mysql.operator/v1
+kind: MySQLDB
+metadata:
+  name: my-database
+  namespace: mysql-operator 
+spec:
+  image: "mysql:8.0"
+  database: "mydatabase"
+  password: "securepassword"
+  storage_size: "10Gi"
+
