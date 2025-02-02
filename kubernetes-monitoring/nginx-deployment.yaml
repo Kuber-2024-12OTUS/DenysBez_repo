@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: custom-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: custom-nginx
+  template:
+    metadata:
+      labels:
+        app: custom-nginx
+    spec:
+      containers:
+      - name: custom-nginx
+        image: custom-nginx-prometheus:latest
+        ports:
+        - containerPort: 80
+        - containerPort: 9113
+        env:
+        - name: NGINX_HOST
+          value: "localhost"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: custom-nginx-service
+spec:
+  selector:
+    app: custom-nginx
+  ports:
+    - name: http  # Added name to the port
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: metrics  # Added name to the port
+      protocol: TCP
+      port: 9113
+      targetPort: 9113
+  type: LoadBalancer  # You can use NodePort or ClusterIP if you prefer
+
