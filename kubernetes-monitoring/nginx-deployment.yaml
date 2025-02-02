@@ -13,15 +13,13 @@ spec:
         app: custom-nginx
     spec:
       containers:
-      - name: custom-nginx
-        image: denysbez/custom-nginx-metrics:latest 
-        imagePullPolicy: Always   
-        ports:
-        - containerPort: 80
-        - containerPort: 9113
-        env:
-        - name: NGINX_PORT
-          value: "80"
-        - name: METRICS_PORT
-          value: "9113"
+        - name: custom-nginx
+          image: denysbez/custom-nginx-metrics:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: NGINX_HOST
+              value: "localhost"
+            - name: NGINX_PORT
+              value: "80"
 
